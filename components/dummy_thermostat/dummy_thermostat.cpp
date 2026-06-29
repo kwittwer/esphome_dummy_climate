@@ -1,6 +1,7 @@
 #include "dummy_thermostat.h"
 #include "esphome/core/log.h"
 #include "esphome/core/hal.h"
+#include <string>
 
 namespace esphome {
 namespace dummy_thermostat {
@@ -46,6 +47,9 @@ void DummyThermostat::setup() {
   this->update_humidity_sensor_();
   this->calculate_action_from_valve_and_mode_();
   this->update_valve_output_();
+#ifdef USE_API
+  this->register_api_services_();
+#endif
   this->publish_state();
 }
 
@@ -457,6 +461,39 @@ void DummyThermostat::set_current_humidity(float value)
   this->calculate_action_from_valve_and_mode_();
     this->publish_state();
 }
+
+#ifdef USE_API
+void DummyThermostat::register_api_services_() {
+  std::string suffix = this->get_object_id();
+  if (suffix.empty()) {
+    suffix = "dummy_thermostat";
+  }
+
+  const std::string temp_service = "set_current_temperature_" + suffix;
+  const std::string hum_service = "set_current_humidity_" + suffix;
+  const std::string valve_service = "set_valve_state_" + suffix;
+
+  this->register_service(&DummyThermostat::api_set_current_temperature_, temp_service, {"wert"});
+  this->register_service(&DummyThermostat::api_set_current_humidity_, hum_service, {"wert"});
+  this->register_service(&DummyThermostat::api_set_valve_state_, valve_service, {"valve"});
+
+  ESP_LOGCONFIG(TAG, "  Registered API service: %s(wert: float)", temp_service.c_str());
+  ESP_LOGCONFIG(TAG, "  Registered API service: %s(wert: float)", hum_service.c_str());
+  ESP_LOGCONFIG(TAG, "  Registered API service: %s(valve: bool)", valve_service.c_str());
+}
+
+void DummyThermostat::api_set_current_temperature_(float wert) {
+  this->set_current_temperature(wert);
+}
+
+void DummyThermostat::api_set_current_humidity_(float wert) {
+  this->set_current_humidity(wert);
+}
+
+void DummyThermostat::api_set_valve_state_(bool valve) {
+  this->set_valve_state(valve);
+}
+#endif
 
 
 }  // namespace dummy_thermostat

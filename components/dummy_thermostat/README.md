@@ -106,12 +106,20 @@ climate:
 
 ## Services (aus HA aufrufbar)
 
-| Service                                 | Parameter        | Beschreibung                                         |
-| --------------------------------------- | ---------------- | ---------------------------------------------------- |
-| `set_valve_state_thermostatN`         | `valve: bool`  | Externe Ventilstellung setzen (von Wärmepumpe etc.) |
-| `set_current_temperature_thermostatN` | `wert: float`  | Istwert von externem Knoten setzen                   |
-| `set_current_humidity_thermostatN`    | `wert: float`  | Istwert Feuchte von externem Knoten setzen           |
-| `set_display_name_thermostatN`        | `name: string` | Anzeigename ändern                                  |
+Die Services werden beim Start automatisch vom Component registriert.
+Der Suffix entspricht der `object_id` der Climate-Instanz.
+
+| Service                                  | Parameter       | Beschreibung                                         |
+| ---------------------------------------- | --------------- | ---------------------------------------------------- |
+| `set_valve_state_<object_id>`            | `valve: bool`   | Externe Ventilstellung setzen (von Waermepumpe etc.) |
+| `set_current_temperature_<object_id>`    | `wert: float`   | Istwert von externem Knoten setzen                   |
+| `set_current_humidity_<object_id>`       | `wert: float`   | Istwert Feuchte von externem Knoten setzen           |
+
+Beispiel: Bei `id: thermostat1` entstehen diese Service-Namen:
+
+- `set_valve_state_thermostat1`
+- `set_current_temperature_thermostat1`
+- `set_current_humidity_thermostat1`
 
 Jeder Service-Aufruf aktualisiert den internen Timestamp — das verhindert das Auslösen des jeweiligen Timeouts.
 

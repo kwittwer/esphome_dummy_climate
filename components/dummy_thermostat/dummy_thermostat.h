@@ -16,10 +16,18 @@
 #include "esphome/components/switch/switch.h"
 #endif
 
+#ifdef USE_API
+#include "esphome/components/api/custom_api_device.h"
+#endif
+
 namespace esphome {
 namespace dummy_thermostat {
 
-class DummyThermostat : public climate::Climate, public Component {
+class DummyThermostat : public climate::Climate, public Component
+#ifdef USE_API
+                       , public api::CustomAPIDevice
+#endif
+{
  public:
   void setup() override;
   void loop() override;
@@ -78,6 +86,13 @@ class DummyThermostat : public climate::Climate, public Component {
   
   bool get_valve_control_enabled_();
   bool get_use_local_valve_control_();
+
+#ifdef USE_API
+  void register_api_services_();
+  void api_set_current_temperature_(float wert);
+  void api_set_current_humidity_(float wert);
+  void api_set_valve_state_(bool valve);
+#endif
   
   sensor::Sensor *fallback_sensor_{nullptr};
   uint32_t temp_sensor_timeout_{600};
