@@ -3,22 +3,6 @@
 #include "esphome/core/hal.h"
 #include <string>
 
-#ifdef USE_API
-#include "esphome/components/api/user_services.h"
-#endif
-
-#ifdef USE_API
-namespace esphome::api {
-
-// Provide local specializations for dynamic custom services in external components.
-template<> bool get_execute_arg_value<bool>(const ExecuteServiceArgument &arg) { return arg.bool_; }
-template<> float get_execute_arg_value<float>(const ExecuteServiceArgument &arg) { return arg.float_; }
-template<> enums::ServiceArgType to_service_arg_type<bool>() { return enums::SERVICE_ARG_TYPE_BOOL; }
-template<> enums::ServiceArgType to_service_arg_type<float>() { return enums::SERVICE_ARG_TYPE_FLOAT; }
-
-}  // namespace esphome::api
-#endif
-
 namespace esphome {
 namespace dummy_thermostat {
 
