@@ -1,0 +1,78 @@
+# Dummy Thermostat - Device Builder Entry
+#
+# Diese Datei zeigt im neuen ESPHome Device Builder editierbare Felder an.
+# Die Component selbst erzeugt keine GUI-Felder; dafür werden Substitutions genutzt.
+
+substitutions:
+  device_name: "dummy_thermostat"
+  friendly_name: "Dummy Thermostat"
+  thermostat_name: "Wohnzimmer"
+  thermostat_id: "thermostat1"
+  thermostat_fallback_sensor: "sensor_dht_1_temperature"
+  thermostat_fallback_humidity_sensor: "sensor_dht_1_humidity"
+  thermostat_sensor_timeout: "900"
+  thermostat_humidity_sensor_timeout: "900"
+  thermostat_valve_switch: "DO1"
+  thermostat_valve_update_timeout: "300"
+  thermostat_valve_control_enabled: "true"
+  thermostat_use_local_valve_control: "false"
+  thermostat_heating_deadband: "0.5"
+  thermostat_heating_overrun: "0.1"
+  thermostat_visual_min_temperature: "15.0"
+  thermostat_visual_max_temperature: "30.0"
+  thermostat_visual_temperature_step_target: "0.5"
+  thermostat_visual_temperature_step_current: "0.1"
+
+esphome:
+  name: ${device_name}
+  friendly_name: ${friendly_name}
+
+external_components:
+  - source:
+      type: git
+      url: https://github.com/kwittwer/esphome_dummy_climate
+      ref: main
+      path: components
+    components: [dummy_thermostat]
+
+switch:
+  - platform: template
+    name: "Lokale Heizregelung"
+    id: local_control_switch
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+  - platform: template
+    name: "Heizung Hauptschalter"
+    id: heating_master_switch
+    entity_category: config
+    optimistic: true
+    restore_mode: RESTORE_DEFAULT_OFF
+
+climate:
+  - platform: dummy_thermostat
+    name: ${thermostat_name}
+    id: ${thermostat_id}
+    fallback_sensor: ${thermostat_fallback_sensor}
+    sensor_timeout: ${thermostat_sensor_timeout}
+    fallback_humidity_sensor: ${thermostat_fallback_humidity_sensor}
+    humidity_sensor_timeout: ${thermostat_humidity_sensor_timeout}
+    valve_switch: ${thermostat_valve_switch}
+    valve_update_timeout: ${thermostat_valve_update_timeout}
+    valve_control_enabled: !lambda |-
+      return ${thermostat_valve_control_enabled};
+    use_local_valve_control: !lambda |-
+      return ${thermostat_use_local_valve_control};
+    heating_deadband: ${thermostat_heating_deadband}
+    heating_overrun: ${thermostat_heating_overrun}
+    visual:
+      min_temperature: ${thermostat_visual_min_temperature}
+      max_temperature: ${thermostat_visual_max_temperature}
+      temperature_step:
+        target_temperature: ${thermostat_visual_temperature_step_target}
+        current_temperature: ${thermostat_visual_temperature_step_current}
+
+dashboard_import:
+  package_import_url: github://kwittwer/esphome_dummy_climate/device_builder.yaml@main
+  import_full_config: false
