@@ -109,11 +109,11 @@ climate:
 Die Services werden beim Start automatisch vom Component registriert.
 Der Suffix entspricht der `object_id` der Climate-Instanz.
 
-| Service                                  | Parameter       | Beschreibung                                         |
-| ---------------------------------------- | --------------- | ---------------------------------------------------- |
-| `set_valve_state_<object_id>`            | `valve: bool`   | Externe Ventilstellung setzen (von Waermepumpe etc.) |
-| `set_current_temperature_<object_id>`    | `wert: float`   | Istwert von externem Knoten setzen                   |
-| `set_current_humidity_<object_id>`       | `wert: float`   | Istwert Feuchte von externem Knoten setzen           |
+| Service                                 | Parameter       | Beschreibung                                         |
+| --------------------------------------- | --------------- | ---------------------------------------------------- |
+| `set_valve_state_<object_id>`         | `valve: bool` | Externe Ventilstellung setzen (von Waermepumpe etc.) |
+| `set_current_temperature_<object_id>` | `wert: float` | Istwert von externem Knoten setzen                   |
+| `set_current_humidity_<object_id>`    | `wert: float` | Istwert Feuchte von externem Knoten setzen           |
 
 Beispiel: Bei `id: thermostat1` entstehen diese Service-Namen:
 
@@ -276,3 +276,4 @@ components/
 - ESPHome: 2026.6.x+
 - Plattformen: ESP32, ESP32-S3
 - Home Assistant: alle Versionen mit ESPHome-Integration
+

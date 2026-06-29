@@ -49,6 +49,9 @@ external_components:
       path: components
     components: [dummy_thermostat]
 
+api:
+  custom_services: true
+
 climate:
   - platform: dummy_thermostat
     name: ${thermostat_name}
