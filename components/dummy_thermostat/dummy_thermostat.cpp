@@ -24,6 +24,67 @@ namespace dummy_thermostat {
 
 static const char *const TAG = "dummy_thermostat";
 
+#ifdef USE_TEXT_SENSOR
+const char *DummyThermostat::get_diagnostic_source_status_() const {
+  if (this->using_fallback_temperature_ && this->using_fallback_humidity_) {
+    return "fallback_both";
+  }
+  if (this->using_fallback_temperature_) {
+    return "fallback_temp";
+  }
+  if (this->using_fallback_humidity_) {
+    return "fallback_humidity";
+  }
+  return "normal";
+}
+
+void DummyThermostat::publish_diagnostic_source_status_() {
+  if (this->source_status_text_sensor_ == nullptr) {
+    return;
+  }
+
+  const char *status = this->get_diagnostic_source_status_();
+  if (this->last_source_status_ != status) {
+    this->last_source_status_ = status;
+    this->source_status_text_sensor_->publish_state(status);
+  }
+}
+#endif
+
+#ifdef USE_BINARY_SENSOR
+void DummyThermostat::publish_diagnostic_binary_states_() {
+  if (this->fallback_temperature_binary_sensor_ != nullptr) {
+    const bool current_state = this->using_fallback_temperature_;
+    if (!this->fallback_temperature_binary_sensor_initialized_ ||
+        this->fallback_temperature_binary_sensor_last_ != current_state) {
+      this->fallback_temperature_binary_sensor_initialized_ = true;
+      this->fallback_temperature_binary_sensor_last_ = current_state;
+      this->fallback_temperature_binary_sensor_->publish_state(current_state);
+    }
+  }
+
+  if (this->fallback_humidity_binary_sensor_ != nullptr) {
+    const bool current_state = this->using_fallback_humidity_;
+    if (!this->fallback_humidity_binary_sensor_initialized_ ||
+        this->fallback_humidity_binary_sensor_last_ != current_state) {
+      this->fallback_humidity_binary_sensor_initialized_ = true;
+      this->fallback_humidity_binary_sensor_last_ = current_state;
+      this->fallback_humidity_binary_sensor_->publish_state(current_state);
+    }
+  }
+
+  if (this->local_controller_binary_sensor_ != nullptr) {
+    const bool current_state = this->valve_timeout_active_;
+    if (!this->local_controller_binary_sensor_initialized_ ||
+        this->local_controller_binary_sensor_last_ != current_state) {
+      this->local_controller_binary_sensor_initialized_ = true;
+      this->local_controller_binary_sensor_last_ = current_state;
+      this->local_controller_binary_sensor_->publish_state(current_state);
+    }
+  }
+}
+#endif
+
 void DummyThermostat::setup() {
   // Restore state
   auto restore = this->restore_state_();
@@ -63,6 +124,12 @@ void DummyThermostat::setup() {
   this->update_humidity_sensor_();
   this->calculate_action_from_valve_and_mode_();
   this->update_valve_output_();
+#ifdef USE_TEXT_SENSOR
+  this->publish_diagnostic_source_status_();
+#endif
+#ifdef USE_BINARY_SENSOR
+  this->publish_diagnostic_binary_states_();
+#endif
 #ifdef USE_API
   this->register_api_services_();
 #endif
@@ -146,6 +213,14 @@ void DummyThermostat::loop() {
   
   // Update physical valve output
   this->update_valve_output_();
+
+#ifdef USE_TEXT_SENSOR
+  this->publish_diagnostic_source_status_();
+#endif
+
+#ifdef USE_BINARY_SENSOR
+  this->publish_diagnostic_binary_states_();
+#endif
 
 }
 

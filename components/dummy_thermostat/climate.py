@@ -1,8 +1,9 @@
 import esphome.codegen as cg
 import esphome.config_validation as cv
-from esphome.components import climate, sensor, switch, output
+from esphome.components import climate, sensor, switch, output, text_sensor, binary_sensor
 from esphome.const import (
     CONF_ID,
+    ENTITY_CATEGORY_DIAGNOSTIC,
 )
 
 CODEOWNERS = ["@your_username"]
@@ -28,6 +29,10 @@ CONF_HEATING_DEADBAND = "heating_deadband"
 CONF_HEATING_OVERRUN = "heating_overrun"
 CONF_COOLING_DEADBAND = "cooling_deadband"
 CONF_COOLING_OVERRUN = "cooling_overrun"
+CONF_DIAGNOSTIC_SOURCE_STATUS = "diagnostic_source_status"
+CONF_DIAGNOSTIC_FALLBACK_TEMPERATURE_ACTIVE = "diagnostic_fallback_temperature_active"
+CONF_DIAGNOSTIC_FALLBACK_HUMIDITY_ACTIVE = "diagnostic_fallback_humidity_active"
+CONF_DIAGNOSTIC_LOCAL_CONTROLLER_ACTIVE = "diagnostic_local_controller_active"
 
 
 CONFIG_SCHEMA = climate.climate_schema(DummyThermostat).extend(
@@ -46,6 +51,18 @@ CONFIG_SCHEMA = climate.climate_schema(DummyThermostat).extend(
         cv.Optional(CONF_HEATING_OVERRUN, default=0.5): cv.temperature,
         cv.Optional(CONF_COOLING_DEADBAND, default=0.5): cv.temperature,
         cv.Optional(CONF_COOLING_OVERRUN, default=0.5): cv.temperature,
+        cv.Optional(CONF_DIAGNOSTIC_SOURCE_STATUS): text_sensor.text_sensor_schema(
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC
+        ),
+        cv.Optional(CONF_DIAGNOSTIC_FALLBACK_TEMPERATURE_ACTIVE): binary_sensor.binary_sensor_schema(
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC
+        ),
+        cv.Optional(CONF_DIAGNOSTIC_FALLBACK_HUMIDITY_ACTIVE): binary_sensor.binary_sensor_schema(
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC
+        ),
+        cv.Optional(CONF_DIAGNOSTIC_LOCAL_CONTROLLER_ACTIVE): binary_sensor.binary_sensor_schema(
+            entity_category=ENTITY_CATEGORY_DIAGNOSTIC
+        ),
     }
 ).extend(cv.COMPONENT_SCHEMA)
 
@@ -91,4 +108,26 @@ async def to_code(config):
     cg.add(var.set_heating_overrun(config[CONF_HEATING_OVERRUN]))
     cg.add(var.set_cooling_deadband(config[CONF_COOLING_DEADBAND]))
     cg.add(var.set_cooling_overrun(config[CONF_COOLING_OVERRUN]))
+
+    if CONF_DIAGNOSTIC_SOURCE_STATUS in config:
+        diagnostic_status = await text_sensor.new_text_sensor(config[CONF_DIAGNOSTIC_SOURCE_STATUS])
+        cg.add(var.set_source_status_text_sensor(diagnostic_status))
+
+    if CONF_DIAGNOSTIC_FALLBACK_TEMPERATURE_ACTIVE in config:
+        diagnostic_fallback_temp = await binary_sensor.new_binary_sensor(
+            config[CONF_DIAGNOSTIC_FALLBACK_TEMPERATURE_ACTIVE]
+        )
+        cg.add(var.set_fallback_temperature_binary_sensor(diagnostic_fallback_temp))
+
+    if CONF_DIAGNOSTIC_FALLBACK_HUMIDITY_ACTIVE in config:
+        diagnostic_fallback_humidity = await binary_sensor.new_binary_sensor(
+            config[CONF_DIAGNOSTIC_FALLBACK_HUMIDITY_ACTIVE]
+        )
+        cg.add(var.set_fallback_humidity_binary_sensor(diagnostic_fallback_humidity))
+
+    if CONF_DIAGNOSTIC_LOCAL_CONTROLLER_ACTIVE in config:
+        diagnostic_local_controller = await binary_sensor.new_binary_sensor(
+            config[CONF_DIAGNOSTIC_LOCAL_CONTROLLER_ACTIVE]
+        )
+        cg.add(var.set_local_controller_binary_sensor(diagnostic_local_controller))
     

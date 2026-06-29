@@ -83,6 +83,10 @@ climate:
       temperature_step:
         target_temperature: 0.5
         current_temperature: 0.1
+
+    # Optional: Diagnose-Textsensor fuer aktive Datenquelle
+    diagnostic_source_status:
+      name: "Wohnzimmer Quellenstatus"
 ```
 
 ## Alle YAML-Optionen
@@ -103,6 +107,7 @@ climate:
 | `heating_overrun`          | float (°C) | 0.5     | Heizen AUS wenn`T >= Soll + overrun`                                    |
 | `cooling_deadband`         | float (°C) | 0.5     | (für externe Kühlsteuerung, nicht lokal genutzt)                        |
 | `cooling_overrun`          | float (°C) | 0.5     | (für externe Kühlsteuerung, nicht lokal genutzt)                        |
+| `diagnostic_source_status` | Textsensor | —      | Optionaler Diagnose-Textsensor mit Quelle: `normal`, `fallback_temp`, `fallback_humidity`, `fallback_both` |
 
 ## Services (aus HA aufrufbar)
 
